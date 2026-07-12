@@ -70,20 +70,23 @@ git commit -m "feat: add ADLC CI triage demo"
 git push -u origin main
 ```
 
-Le workflow agentique est volontairement déclenché uniquement par `workflow_dispatch` et son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
+Le workflow agentique reste déclarativement déclenchable par `workflow_dispatch`, mais `CI Triage Dispatcher` peut maintenant le déclencher automatiquement après un échec de `CI` ou `Failure Lab`. Son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
 
-## Exécuter la démonstration — interventions manuelles
+## Exécuter la démonstration — mode automatique et secours manuel
+
+Le workflow `CI Triage Agent` se déclenche maintenant automatiquement lorsqu’un workflow `CI` ou `Failure Lab` terminé sur `main` possède la conclusion `failure`.
 
 Pour chacun des trois scénarios (`test`, `lint`, `typecheck`) :
 
 1. Ouvrir l’onglet **Actions**, sélectionner **Failure Lab**, cliquer sur **Run workflow**, choisir le scénario et confirmer.
-2. Attendre l’échec contrôlé. Copier l’URL complète du run dans la barre d’adresse.
-3. Sélectionner **CI Triage Agent**, cliquer sur **Run workflow**, coller l’URL du run dans `ci_run_url`, puis confirmer.
-4. Vérifier que le run agent crée au maximum une issue `[CI triage] ...` avec les sections imposées dans le prompt.
-5. Relire l’issue manuellement, appliquer la grille de `docs/evaluation.md`, puis cocher l’acceptation dans le registre `docs/metrics.md`.
-6. Consulter le résumé du run dans GitHub pour reporter la durée, le nombre d’issues et les AIC observés. `gh aw logs` reste une option si GitHub CLI est authentifié séparément pour l’API.
+2. Attendre l’échec contrôlé. L’URL du run reste visible pour le suivi, mais il n’est plus nécessaire de la copier en mode automatique.
+3. Attendre que **CI Triage Agent** apparaisse automatiquement dans l’onglet **Actions**. Aucun collage d’URL n’est requis dans ce mode.
+4. En cas de besoin, le bouton **Run workflow** de **CI Triage Agent** reste disponible comme secours manuel : choisir `main`, laisser `Agent caller context` vide, puis coller l’URL dans `ci_run_url`.
+5. Vérifier que le run agent crée au maximum une issue `[CI triage] ...` avec les sections imposées dans le prompt.
+6. Relire l’issue manuellement, appliquer la grille de `docs/evaluation.md`, puis cocher l’acceptation dans le registre `docs/metrics.md`.
+7. Consulter le résumé du run dans GitHub pour reporter la durée, le nombre d’issues et les AIC observés. `gh aw logs` reste une option si GitHub CLI est authentifié séparément pour l’API.
 
-Ces actions humaines sont indispensables : l’issue est une proposition de diagnostic, pas une autorisation de corriger ou de déployer.
+Ces actions humaines restent indispensables : l’issue est une proposition de diagnostic, pas une autorisation de corriger ou de déployer. Le déclenchement est automatique, mais la validation de la sortie reste humaine.
 
 ## Documentation ADLC
 

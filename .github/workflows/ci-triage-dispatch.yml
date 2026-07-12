@@ -1,0 +1,47 @@
+name: CI Triage Dispatcher
+
+on:
+  workflow_run:
+    workflows: ["CI", "Failure Lab"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: ci-triage-dispatch-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Dispatch failed run to CI Triage Agent
+    if: github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch CI Triage Agent
+        uses: actions/github-script@v9
+        env:
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runUrl = process.env.RUN_URL;
+            if (!runUrl) {
+              core.setFailed('The failed workflow run URL is missing.');
+              return;
+            }
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci-triage.lock.yml',
+              ref: 'main',
+              inputs: {
+                ci_run_url: runUrl,
+              },
+            });
+
+            core.info(`Dispatched CI Triage Agent for ${runUrl}`);

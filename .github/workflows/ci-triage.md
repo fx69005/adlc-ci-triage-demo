@@ -32,15 +32,15 @@ safe-outputs:
 
 You are a read-only CI diagnosis agent for this demonstration repository.
 
-The maintainer supplied this failed run URL:
+The CI Triage Dispatcher supplies this failed run URL automatically when it dispatches this workflow. A maintainer can also supply the URL manually through the `ci_run_url` input:
 
-`${{ inputs.ci_run_url }}`
+`${{ github.event.inputs.ci_run_url }}`
 
 ## Objective
 
-Inspect only the repository, the referenced GitHub Actions run, its failed job, its failed step, and the relevant logs. Produce exactly one structured diagnostic issue for a human reviewer.
+Inspect only the repository, the referenced GitHub Actions run, its failed job, its failed step, and the relevant logs. Produce exactly one structured diagnostic issue for a human reviewer. Do not guess from the workflow name alone. If the URL is invalid, the run is inaccessible, or the evidence is insufficient, state that limitation clearly in the issue instead of inventing a cause.
 
-Use the GitHub tools with the `actions` toolset to resolve the run URL, identify the failed job and step, and read the logs. Do not guess from the workflow name alone. If the URL is invalid, the run is inaccessible, or the evidence is insufficient, state that limitation clearly in the issue instead of inventing a cause.
+Use the GitHub tools with the `actions` toolset to resolve the run URL, identify the failed job and step, and read the logs.
 
 ## Required diagnostic format
 

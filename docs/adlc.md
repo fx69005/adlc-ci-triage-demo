@@ -52,6 +52,6 @@ La sortie de l’agent n’est pas une décision de déploiement et ne modifie j
 
 La V1 est considérée comme démontrée quand les trois scénarios s’exécutent, que chaque issue respecte le format imposé, qu’au moins deux diagnostics sur trois sont validés humainement et qu’aucune clé ou écriture de code ne fuit dans les logs ou sorties.
 
-Le déclenchement reste manuel en V1. Un déclenchement automatique sur échec CI est hors périmètre tant que les trois scénarios et la revue humaine ne sont pas validés.
+Le workflow prend désormais en charge un déclenchement automatique sur échec de `CI` ou `Failure Lab` sur `main`, avec `workflow_dispatch` conservé comme secours manuel. La validation complète des trois scénarios reste nécessaire avant de considérer l’automatisation comme validée.
 
 À la compilation, `gh aw` peut signaler les noms de secrets restreints comme une modification à approuver. Cette approbation porte sur la configuration et les noms (`OPENAI_API_KEY` / `CODEX_API_KEY`), jamais sur une valeur de clé : la valeur réelle est ajoutée manuellement dans les secrets GitHub après publication.
