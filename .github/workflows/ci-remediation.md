@@ -22,6 +22,7 @@ network:
   allowed:
     - defaults
     - node
+    - fonts
 steps:
   - name: Install Node dependencies for agent validation
     run: npm ci --ignore-scripts

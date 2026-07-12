@@ -78,7 +78,7 @@ Le workflow `CI Triage Agent` reste déclarativement déclenchable par `workflow
 
 Le workflow séparé `CI Remediation Agent` répond uniquement au commentaire `/fix-ci` dans une issue de triage. Il vérifie que les trois validations humaines sont cochées, modifie seulement `src/**` ou `scripts/**`, puis peut créer au maximum une draft PR vers `main` sur une branche `ai-fix/*`. Il ne merge jamais et ne modifie pas les fichiers protégés.
 
-Le workflow installe d’abord les dépendances verrouillées avec `npm ci --ignore-scripts`, avant l’exécution de l’agent. Il autorise uniquement les domaines de base et l’écosystème `node` (npm) pour les besoins Node ; les autres accès réseau restent bloqués.
+Le workflow installe d’abord les dépendances verrouillées avec `npm ci --ignore-scripts`, avant l’exécution de l’agent. Il autorise uniquement les domaines de base et les écosystèmes `node` (npm) et `fonts` pour les besoins de build ; les autres accès réseau restent bloqués.
 
 ## Exécuter la démonstration — mode automatique et secours manuel
 
@@ -111,6 +111,7 @@ Pour que la CI se déclenche sur une PR créée par l’agent, ajouter séparém
 ## Documentation ADLC
 
 - `docs/adlc.md` : phases Plan → Build → Test → Deploy → Operate, remédiation contrôlée, permissions, prompt injection et revue humaine.
+- `docs/adlc-roadmap.md` : liste des capacités ADLC, état actuel, décisions différées et ordre recommandé des prochaines étapes.
 - `docs/evaluation.md` : trois scénarios, causes attendues et grille d’acceptation.
 - `docs/metrics.md` : registre de durée, acceptation, erreurs, issues et consommation.
 
