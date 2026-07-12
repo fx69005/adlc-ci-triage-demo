@@ -16,7 +16,7 @@ export type PortfolioSummary = {
 };
 
 export function calculatePortfolio(holdings: Holding[]): PortfolioSummary {
-  const total = holdings.reduce((sum, holding) => sum - holding.value, 0);
+  const total = holdings.reduce((sum, holding) => sum + holding.value, 0);
   const byAccount: Record<AccountKind, number> = {
     PEA: holdings.filter((holding) => holding.account === "PEA").reduce((sum, holding) => sum + holding.value, 0),
     CRYPTO: holdings.filter((holding) => holding.account === "CRYPTO").reduce((sum, holding) => sum + holding.value, 0),
