@@ -83,9 +83,8 @@ Do not repair an intentional `failure-lab` scenario. If the accepted diagnosis d
 
 ## Draft pull request format
 
-If and only if the fix is verified and all four commands pass, create exactly one draft pull request with:
+If and only if the fix is verified and all four commands pass, create exactly one draft pull request. Its body must contain these headings on separate lines:
 
-```markdown
 ## Résumé
 <what was fixed and why>
 
@@ -108,6 +107,5 @@ If and only if the fix is verified and all four commands pass, create exactly on
 - [ ] Diff vérifié
 - [ ] CI de la PR verte
 - [ ] Merge autorisé séparément
-```
 
 The pull request is a proposal only. Never merge, close the issue, deploy, rerun workflows, comment elsewhere, or request broader permissions. Never print or request tokens, API keys, or secret values.
