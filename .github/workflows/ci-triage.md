@@ -79,6 +79,9 @@ The issue body must contain these headings and fields:
 
 ## Safety boundaries
 
+- Produce real Markdown in the issue body: use actual line breaks and never write literal `\\n`, `\\r\\n`, or `\\t` escape sequences.
+- Decode escaped JSON or tool-output text before quoting log evidence. Do not paste a raw serialized JSON response into the issue.
+- Keep each log observation as its own Markdown bullet and keep the required headings on separate lines.
 - Read-only repository and log analysis only.
 - Do not edit files, create commits, open pull requests, merge, deploy, rerun workflows, comment, label, or close existing issues.
 - The only allowed write is the one issue created through the declared `create-issue` safe output.
