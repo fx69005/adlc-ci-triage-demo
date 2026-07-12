@@ -78,7 +78,7 @@ Le workflow `CI Triage Agent` reste déclarativement déclenchable par `workflow
 
 Le workflow séparé `CI Remediation Agent` répond uniquement au commentaire `/fix-ci` dans une issue de triage. Il vérifie que les trois validations humaines sont cochées, modifie seulement `src/**` ou `scripts/**`, puis peut créer au maximum une draft PR vers `main` sur une branche `ai-fix/*`. Il ne merge jamais et ne modifie pas les fichiers protégés.
 
-Pour exécuter les validations Node dans le sandbox de l’agent, ce workflow autorise uniquement les domaines de base et l’écosystème `node` (npm). Les autres accès réseau restent bloqués.
+Le workflow installe d’abord les dépendances verrouillées avec `npm ci --ignore-scripts`, avant l’exécution de l’agent. Il autorise uniquement les domaines de base et l’écosystème `node` (npm) pour les besoins Node ; les autres accès réseau restent bloqués.
 
 ## Exécuter la démonstration — mode automatique et secours manuel
 
