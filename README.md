@@ -76,7 +76,9 @@ git push -u origin main
 
 Le workflow `CI Triage Agent` reste déclarativement déclenchable par `workflow_dispatch`, mais `CI Triage Dispatcher` peut maintenant le déclencher automatiquement après un échec de `CI` ou `Failure Lab`. Son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
 
-Le workflow séparé `CI Remediation Agent` répond uniquement au commentaire `/fix-ci` dans une issue de triage. Il vérifie que les deux validations humaines sont cochées, modifie seulement `src/**` ou `scripts/**`, puis peut créer au maximum une draft PR vers `main` sur une branche `ai-fix/*`. Il ne merge jamais et ne modifie pas les fichiers protégés.
+Le workflow séparé `CI Remediation Agent` répond uniquement au commentaire `/fix-ci` dans une issue de triage. Il vérifie que les trois validations humaines sont cochées, modifie seulement `src/**` ou `scripts/**`, puis peut créer au maximum une draft PR vers `main` sur une branche `ai-fix/*`. Il ne merge jamais et ne modifie pas les fichiers protégés.
+
+Pour exécuter les validations Node dans le sandbox de l’agent, ce workflow autorise uniquement les domaines de base et l’écosystème `node` (npm). Les autres accès réseau restent bloqués.
 
 ## Exécuter la démonstration — mode automatique et secours manuel
 

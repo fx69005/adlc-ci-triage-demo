@@ -18,6 +18,10 @@ tools:
 engine: codex
 max-ai-credits: 75
 timeout-minutes: 20
+network:
+  allowed:
+    - defaults
+    - node
 safe-outputs:
   report-failure-as-issue: false
   create-pull-request:
