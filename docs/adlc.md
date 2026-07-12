@@ -56,7 +56,7 @@ La sortie de l’agent n’est pas une décision de déploiement et ne modifie j
 
 Pour une draft PR, le reviewer vérifie aussi :
 
-1. que le commentaire `/fix-ci` a été demandé après les deux validations humaines ;
+1. que le commentaire `/fix-ci` a été demandé après les trois validations humaines ;
 2. que la branche est une branche `ai-fix/*` et que `main` n’a pas été modifiée directement ;
 3. que le diff reste limité à la cause diagnostiquée ;
 4. que lint, tests, typecheck et build sont verts ;

@@ -98,7 +98,7 @@ Ces actions humaines restent indispensables : l’issue est une proposition de d
 
 Une fois le diagnostic vérifié :
 
-1. Cocher `Diagnostic accepté` et `Cause vérifiée dans le dépôt et les logs` dans l’issue.
+1. Cocher les trois cases de revue dans l’issue, dont `Action corrective autorisée séparément`.
 2. Ajouter un commentaire dont le premier mot est exactement `/fix-ci`.
 3. Attendre le workflow **CI Remediation Agent**.
 4. Examiner la draft PR, sa branche `ai-fix/*`, son diff et les quatre contrôles CI.
