@@ -1,6 +1,6 @@
 # ADLC CI Triage Demo
 
-Cette démo montre un flux engineering contrôlé : une CI déterministe échoue, un agent Codex lit le run et ses logs, puis demande la création d’une seule issue de diagnostic à faire valider par un humain.
+Cette démo montre un flux engineering contrôlé : une CI déterministe échoue, un agent Codex lit le run et ses logs, puis demande la création d’une seule issue de diagnostic à faire valider par un humain. Après validation explicite, un second agent peut proposer une correction dans une branche dédiée et une draft pull request.
 
 La micro-application est une interface locale fictive de portefeuille PEA et crypto. Elle n’utilise aucune donnée Finary, aucun service externe et aucun secret.
 
@@ -11,6 +11,10 @@ flowchart LR
     CI[CI en échec] --> Agent[Agent Codex]
     Agent --> Issue[Issue structurée]
     Issue --> Human[Revue humaine]
+    Human -->|/fix-ci| Fix[Agent de remédiation]
+    Fix --> PR[Draft PR sur branche ai-fix/*]
+    PR --> PRCI[CI de la PR]
+    PRCI --> Merge[Revue et merge humain]
     Human --> Metrics[Métriques]
 ```
 
@@ -58,7 +62,7 @@ Les projets Finary de ce poste utilisent SSH avec la clé `id_ed25519_github_fin
 
 ## Compilation Agentic Workflows
 
-La structure a été initialisée avec `gh-aw v0.81.6`. Le fichier source modifiable est `.github/workflows/ci-triage.md` ; le fichier exécutable compilé est `.github/workflows/ci-triage.lock.yml`.
+La structure a été initialisée avec `gh-aw v0.81.6`. Les fichiers sources modifiables sont `.github/workflows/ci-triage.md` et `.github/workflows/ci-remediation.md` ; les fichiers exécutables compilés sont leurs équivalents `.lock.yml`.
 
 Depuis un environnement authentifié :
 
@@ -70,7 +74,9 @@ git commit -m "feat: add ADLC CI triage demo"
 git push -u origin main
 ```
 
-Le workflow agentique reste déclarativement déclenchable par `workflow_dispatch`, mais `CI Triage Dispatcher` peut maintenant le déclencher automatiquement après un échec de `CI` ou `Failure Lab`. Son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
+Le workflow `CI Triage Agent` reste déclarativement déclenchable par `workflow_dispatch`, mais `CI Triage Dispatcher` peut maintenant le déclencher automatiquement après un échec de `CI` ou `Failure Lab`. Son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
+
+Le workflow séparé `CI Remediation Agent` répond uniquement au commentaire `/fix-ci` dans une issue de triage. Il vérifie que les deux validations humaines sont cochées, modifie seulement `src/**` ou `scripts/**`, puis peut créer au maximum une draft PR vers `main` sur une branche `ai-fix/*`. Il ne merge jamais et ne modifie pas les fichiers protégés.
 
 ## Exécuter la démonstration — mode automatique et secours manuel
 
@@ -88,9 +94,21 @@ Pour chacun des trois scénarios (`test`, `lint`, `typecheck`) :
 
 Ces actions humaines restent indispensables : l’issue est une proposition de diagnostic, pas une autorisation de corriger ou de déployer. Le déclenchement est automatique, mais la validation de la sortie reste humaine.
 
+## Demander une correction par PR
+
+Une fois le diagnostic vérifié :
+
+1. Cocher `Diagnostic accepté` et `Cause vérifiée dans le dépôt et les logs` dans l’issue.
+2. Ajouter un commentaire dont le premier mot est exactement `/fix-ci`.
+3. Attendre le workflow **CI Remediation Agent**.
+4. Examiner la draft PR, sa branche `ai-fix/*`, son diff et les quatre contrôles CI.
+5. Merger uniquement après revue humaine et CI verte.
+
+Pour que la CI se déclenche sur une PR créée par l’agent, ajouter séparément le secret `GH_AW_CI_TRIGGER_TOKEN` contenant un PAT finement limité avec `Contents: Read & Write`. Ne jamais placer la valeur du token dans le dépôt ou dans les logs.
+
 ## Documentation ADLC
 
-- `docs/adlc.md` : phases Plan → Build → Test → Deploy → Operate, permissions, prompt injection et revue humaine.
+- `docs/adlc.md` : phases Plan → Build → Test → Deploy → Operate, remédiation contrôlée, permissions, prompt injection et revue humaine.
 - `docs/evaluation.md` : trois scénarios, causes attendues et grille d’acceptation.
 - `docs/metrics.md` : registre de durée, acceptation, erreurs, issues et consommation.
 
@@ -100,4 +118,4 @@ La démonstration utilise GitHub Agentic Workflows, avec compilation d’un Mark
 
 ## Non-objectifs V1
 
-Pas de déclenchement automatique sur échec CI, pas de correction automatique, pas de pull request, pas de déploiement, pas d’orchestrateur autonome, pas de multi-agent, pas de MCP tiers, pas de données réelles et pas d’intégration GCP.
+Pas de correction sans commande humaine explicite, pas de modification directe de `main`, pas de merge automatique, pas de déploiement, pas d’orchestrateur autonome, pas de multi-agent non contrôlé, pas de MCP tiers, pas de données réelles et pas d’intégration GCP.
