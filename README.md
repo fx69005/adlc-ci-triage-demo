@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ADLC CI Triage Demo
 
-## Getting Started
+Cette démo montre un flux engineering contrôlé : une CI déterministe échoue, un agent Codex lit le run et ses logs, puis demande la création d’une seule issue de diagnostic à faire valider par un humain.
 
-First, run the development server:
+La micro-application est une interface locale fictive de portefeuille PEA et crypto. Elle n’utilise aucune donnée Finary, aucun service externe et aucun secret.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Flux
+
+```mermaid
+flowchart LR
+    CI[CI en échec] --> Agent[Agent Codex]
+    Agent --> Issue[Issue structurée]
+    Issue --> Human[Revue humaine]
+    Human --> Metrics[Métriques]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Démarrage local
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Pré-requis : Node.js 24 et npm.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+npm ci
+npm run dev
+```
 
-## Learn More
+Les contrôles de la CI sont exécutables localement :
 
-To learn more about Next.js, take a look at the following resources:
+```powershell
+npm run lint
+npm test
+npm run typecheck
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Le failure-lab provoque exactement un échec choisi :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```powershell
+npm run failure-lab -- test
+npm run failure-lab -- lint
+npm run failure-lab -- typecheck
+```
 
-## Deploy on Vercel
+## Publication GitHub — action manuelle requise
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Authentifier GitHub CLI : `gh auth login`, puis vérifier avec `gh auth status`.
+2. Depuis la racine du dépôt, créer le dépôt public et pousser `main` :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```powershell
+   gh repo create adlc-ci-triage-demo --public --source=. --remote=origin --push
+   ```
+
+3. Créer une clé API OpenAI dédiée au projet depuis la console OpenAI. Ne pas la mettre dans un fichier local ni dans une commande enregistrée dans l’historique.
+4. Ajouter cette clé uniquement dans GitHub : `Settings → Secrets and variables → Actions → New repository secret`, nom `OPENAI_API_KEY`.
+5. Vérifier que GitHub Actions est activé et que le dépôt public ne contient pas de secret dans les fichiers ou les logs.
+
+## Compilation Agentic Workflows
+
+La structure a été initialisée avec `gh-aw v0.81.6`. Le fichier source modifiable est `.github/workflows/ci-triage.md` ; le fichier exécutable compilé est `.github/workflows/ci-triage.lock.yml`.
+
+Depuis un environnement authentifié :
+
+```powershell
+gh aw validate --strict
+gh aw compile --strict --approve
+git add .
+git commit -m "feat: add ADLC CI triage demo"
+git push -u origin main
+```
+
+Le workflow agentique est volontairement déclenché uniquement par `workflow_dispatch` et son seul safe output est `create-issue` avec `max: 1`. Il n’a pas le droit de modifier le code, d’ouvrir une pull request, de commenter, de merger ou de déployer.
+
+## Exécuter la démonstration — interventions manuelles
+
+Pour chacun des trois scénarios (`test`, `lint`, `typecheck`) :
+
+1. Ouvrir l’onglet **Actions**, sélectionner **Failure Lab**, cliquer sur **Run workflow**, choisir le scénario et confirmer.
+2. Attendre l’échec contrôlé. Copier l’URL complète du run dans la barre d’adresse.
+3. Sélectionner **CI Triage Agent**, cliquer sur **Run workflow**, coller l’URL du run dans `ci_run_url`, puis confirmer.
+4. Vérifier que le run agent crée au maximum une issue `[CI triage] ...` avec les sections imposées dans le prompt.
+5. Relire l’issue manuellement, appliquer la grille de `docs/evaluation.md`, puis cocher l’acceptation dans le registre `docs/metrics.md`.
+6. Consulter le résumé du run ou `gh aw logs` pour reporter la durée, le nombre d’issues et les AIC observés.
+
+Ces actions humaines sont indispensables : l’issue est une proposition de diagnostic, pas une autorisation de corriger ou de déployer.
+
+## Documentation ADLC
+
+- `docs/adlc.md` : phases Plan → Build → Test → Deploy → Operate, permissions, prompt injection et revue humaine.
+- `docs/evaluation.md` : trois scénarios, causes attendues et grille d’acceptation.
+- `docs/metrics.md` : registre de durée, acceptation, erreurs, issues et consommation.
+
+## Portabilité
+
+La démonstration utilise GitHub Agentic Workflows, avec compilation d’un Markdown en workflow GitHub Actions `.lock.yml`. Une future variante GitLab pourrait conserver la même logique — URL du job échoué → agent en lecture seule → rapport structuré → revue humaine — dans un job GitLab CI, sans réutiliser directement les mécanismes GitHub `safe-outputs`.
+
+## Non-objectifs V1
+
+Pas de déclenchement automatique sur échec CI, pas de correction automatique, pas de pull request, pas de déploiement, pas d’orchestrateur autonome, pas de multi-agent, pas de MCP tiers, pas de données réelles et pas d’intégration GCP.

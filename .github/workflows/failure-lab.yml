@@ -1,0 +1,37 @@
+name: Failure Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      failure:
+        description: "Failure to trigger deliberately"
+        required: true
+        type: choice
+        options:
+          - test
+          - lint
+          - typecheck
+
+permissions:
+  contents: read
+
+jobs:
+  failure-lab:
+    name: Deliberate ${{ inputs.failure }} failure
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run selected failure lab
+        run: npm run failure-lab -- "${{ inputs.failure }}"
