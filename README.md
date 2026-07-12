@@ -40,13 +40,16 @@ npm run failure-lab -- lint
 npm run failure-lab -- typecheck
 ```
 
-## Publication GitHub — action manuelle requise
+## Publication GitHub par SSH — action manuelle requise
 
-1. Authentifier GitHub CLI : `gh auth login`, puis vérifier avec `gh auth status`.
-2. Depuis la racine du dépôt, créer le dépôt public et pousser `main` :
+Les projets Finary de ce poste utilisent SSH avec la clé `id_ed25519_github_finary`. GitHub CLI n’est donc pas requis pour pousser ce dépôt.
+
+1. Ouvrir [la création d’un nouveau dépôt GitHub](https://github.com/new), choisir le compte `fx69005`, saisir `adlc-ci-triage-demo`, sélectionner **Public**, et ne pas initialiser avec README, `.gitignore` ou licence.
+2. Depuis la racine du dépôt local, ajouter le remote SSH et pousser `main` :
 
    ```powershell
-   gh repo create adlc-ci-triage-demo --public --source=. --remote=origin --push
+   git remote add origin git@github.com:fx69005/adlc-ci-triage-demo.git
+   git push -u origin main
    ```
 
 3. Créer une clé API OpenAI dédiée au projet depuis la console OpenAI. Ne pas la mettre dans un fichier local ni dans une commande enregistrée dans l’historique.
@@ -78,7 +81,7 @@ Pour chacun des trois scénarios (`test`, `lint`, `typecheck`) :
 3. Sélectionner **CI Triage Agent**, cliquer sur **Run workflow**, coller l’URL du run dans `ci_run_url`, puis confirmer.
 4. Vérifier que le run agent crée au maximum une issue `[CI triage] ...` avec les sections imposées dans le prompt.
 5. Relire l’issue manuellement, appliquer la grille de `docs/evaluation.md`, puis cocher l’acceptation dans le registre `docs/metrics.md`.
-6. Consulter le résumé du run ou `gh aw logs` pour reporter la durée, le nombre d’issues et les AIC observés.
+6. Consulter le résumé du run dans GitHub pour reporter la durée, le nombre d’issues et les AIC observés. `gh aw logs` reste une option si GitHub CLI est authentifié séparément pour l’API.
 
 Ces actions humaines sont indispensables : l’issue est une proposition de diagnostic, pas une autorisation de corriger ou de déployer.
 

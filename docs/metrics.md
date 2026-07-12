@@ -12,7 +12,7 @@ Ce fichier sert de registre manuel pour la V1. Une ligne est ajoutée après cha
 - **Taux de diagnostics acceptés** : diagnostics acceptés / diagnostics exécutés. La cible V1 est au moins `2/3`.
 - **Erreur de diagnostic** : cause incorrecte, preuve absente, reproduction incohérente ou niveau de confiance injustifié.
 - **Issues créées** : nombre d’issues créées par le safe output `create-issue`. La cible est une issue au maximum par run agent.
-- **Consommation par run** : valeur AIC affichée par `gh aw logs` ou par le résumé d’exécution. La limite configurée est `max-ai-credits: 50`.
+- **Consommation par run** : valeur AIC affichée par le résumé d’exécution GitHub ou par `gh aw logs` si GitHub CLI est authentifié pour l’API. La limite configurée est `max-ai-credits: 50`.
 
 ## Résumé V1
 
