@@ -40,7 +40,7 @@ safe-outputs:
       - "src/**"
       - "scripts/**"
     protected-files: fallback-to-issue
-    auto-close-issue: false
+    auto-close-issue: true
     github-token-for-extra-empty-commit: ${{ secrets.GH_AW_CI_TRIGGER_TOKEN }}
 ---
 
